@@ -1,0 +1,1298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SCB : AEROnix</title>
+  <meta name="theme-color" content="#426346">
+  <link rel="manifest" href="./manifest.json">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --surface: rgba(250, 248, 239, 0.92);
+      --border: rgba(91, 112, 80, 0.24);
+      --muted: #59624f;
+      --text: #39382e;
+      --green-dark: #426346;
+      --cocoa: #76563f;
+      --cocoa-dark: #5b4332;
+      --cocoa-light: #ead9c5;
+      --gold: #9a7427;
+      --gold-light: #f0e2b9;
+    }
+    body {
+      min-height: 100vh;
+      font-family: Inter, "Segoe UI", system-ui, -apple-system, sans-serif;
+      background:
+        radial-gradient(circle at 8% 12%, rgba(202, 164, 83, 0.23), transparent 19rem),
+        radial-gradient(circle at 92% 18%, rgba(139, 166, 119, 0.24), transparent 22rem),
+        linear-gradient(145deg, #e5d8c5 0%, #d5e0ca 56%, #e2ddcb 100%);
+      color: var(--text);
+      padding: 28px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-x: hidden;
+    }
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      z-index: -1;
+      width: 180px;
+      height: 180px;
+      border: 2px dashed rgba(92, 119, 76, 0.22);
+      border-radius: 48% 52% 58% 42%;
+    }
+    body::before { left: -85px; bottom: 8%; transform: rotate(28deg); }
+    body::after { right: -90px; top: 22%; transform: rotate(-20deg); }
+    .splash-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 15% 20%, rgba(201, 168, 91, 0.28), transparent 18rem),
+        radial-gradient(circle at 85% 78%, rgba(117, 151, 103, 0.30), transparent 22rem),
+        linear-gradient(145deg, #e5d8c5 0%, #d5e0ca 56%, #e2ddcb 100%);
+      animation: splash-sequence 3.2s ease-in-out forwards;
+    }
+    .splash-screen::before,
+    .splash-screen::after {
+      content: "";
+      position: absolute;
+      width: 140px;
+      height: 68px;
+      border: 2px solid rgba(66, 99, 70, 0.24);
+      border-radius: 100% 0 100% 0;
+      transform: rotate(-28deg);
+    }
+    .splash-screen::before { left: -30px; top: 17%; }
+    .splash-screen::after { right: -24px; bottom: 15%; transform: rotate(152deg); }
+    .splash-content {
+      width: min(100%, 760px);
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+    .splash-logo {
+      display: block;
+      width: min(100%, 700px);
+      height: auto;
+      margin: 0 auto;
+      filter: drop-shadow(0 18px 34px rgba(77, 68, 46, 0.22));
+    }
+    .splash-caption {
+      margin-top: 20px;
+      color: var(--cocoa-dark);
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(1rem, 3vw, 1.25rem);
+      font-weight: 700;
+      letter-spacing: 0.025em;
+    }
+    @keyframes splash-sequence {
+      0% { opacity: 0; }
+      18%, 72% { opacity: 1; }
+      100% { opacity: 0; visibility: hidden; }
+    }
+    .dashboard-content {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      opacity: 0;
+      transform: translateY(10px);
+      animation: dashboard-reveal 0.8s ease 2.25s forwards;
+    }
+    @keyframes dashboard-reveal {
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .garden-leaves {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: -1;
+      overflow: hidden;
+    }
+    .garden-leaves span {
+      position: absolute;
+      width: 44px;
+      height: 22px;
+      border-radius: 44px 5px 44px 5px;
+      background: rgba(83, 119, 73, 0.22);
+      transform: rotate(var(--angle));
+    }
+    .garden-leaves span::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 12%;
+      width: 75%;
+      height: 1px;
+      background: rgba(68, 87, 56, 0.28);
+      transform: rotate(-8deg);
+    }
+    .garden-leaves span:nth-child(1) { left: 4%; top: 24%; --angle: 28deg; }
+    .garden-leaves span:nth-child(2) { right: 5%; top: 42%; --angle: -38deg; background: rgba(132, 96, 65, 0.20); }
+    .garden-leaves span:nth-child(3) { left: 8%; bottom: 8%; --angle: -24deg; }
+    .garden-leaves span:nth-child(4) { right: 9%; bottom: 12%; --angle: 35deg; background: rgba(132, 96, 65, 0.18); }
+    .garden-leaves span:nth-child(5) { left: 46%; top: 3%; --angle: 64deg; width: 32px; height: 16px; }
+    header {
+      width: 100%;
+      max-width: 960px;
+      text-align: left;
+      margin-bottom: 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 20px;
+    }
+    .brand-heading { margin-bottom: 8px; line-height: 0; }
+    .header-logo {
+      display: block;
+      width: min(100%, 560px);
+      height: auto;
+      filter: drop-shadow(0 4px 8px rgba(77, 68, 46, 0.12));
+    }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      color: var(--cocoa);
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      padding: 6px 10px;
+      border: 1px solid rgba(91, 112, 80, 0.18);
+      border-radius: 999px;
+      background: rgba(240, 235, 219, 0.84);
+      margin-bottom: 0;
+    }
+    h1 {
+      font-size: clamp(1.65rem, 4vw, 2.25rem);
+      line-height: 1.05;
+    }
+    .brand-scb {
+      color: var(--cocoa-dark);
+      font-family: Georgia, "Times New Roman", serif;
+      font-weight: 800;
+      letter-spacing: -0.06em;
+    }
+    .brand-separator {
+      color: var(--gold);
+      font-family: Georgia, "Times New Roman", serif;
+      font-weight: 400;
+    }
+    .brand-aeronix {
+      color: var(--green-dark);
+      font-family: "Arial Rounded MT Bold", "Trebuchet MS", "Segoe UI", sans-serif;
+      font-weight: 700;
+      letter-spacing: 0.015em;
+    }
+    .status-bar {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--surface);
+      backdrop-filter: blur(12px);
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      white-space: nowrap;
+      box-shadow: 0 8px 24px rgba(93, 73, 52, 0.10);
+    }
+    .dot {
+      height: 9px;
+      width: 9px;
+      background-color: #648857;
+      border-radius: 50%;
+      box-shadow: 0 0 12px rgba(100, 136, 87, 0.48);
+    }
+
+    /* Fan Banner Card */
+    .fan-banner {
+      width: 100%;
+      max-width: 960px;
+      background: linear-gradient(120deg, #f8f2e7, #e0e8d6);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      padding: 18px 20px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      transition: all 0.3s ease;
+      box-shadow: 0 16px 38px rgba(86, 70, 50, 0.13);
+    }
+    .fan-banner.active {
+      border-color: rgba(83, 119, 73, 0.48);
+      background: linear-gradient(120deg, #e3ecd9, #d2e0c8);
+      box-shadow: 0 16px 38px rgba(83, 119, 73, 0.20);
+    }
+    .fan-left { display: flex; align-items: center; gap: 14px; }
+    .fan-icon {
+      width: 54px;
+      height: 54px;
+      flex: 0 0 54px;
+      display: grid;
+      place-items: center;
+      border-radius: 18px;
+      color: var(--cocoa);
+      background: var(--cocoa-light);
+      border: 1px solid var(--border);
+      font-size: 1.55rem;
+    }
+    .fan-banner.active .fan-icon {
+      color: var(--green-dark);
+      background: #c8daba;
+      animation: spin 1.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .fan-info h2 { font-size: 1.08rem; margin-bottom: 5px; }
+    .fan-reason { font-size: 0.86rem; color: var(--muted); }
+    .fan-control-note { margin-top: 5px; color: var(--muted); font-size: 0.72rem; }
+    .fan-state {
+      min-width: 82px;
+      text-align: center;
+      font-size: 1.15rem;
+      font-weight: 800;
+      padding: 9px 16px;
+      border-radius: 999px;
+      background: #eee6d9;
+      color: var(--muted);
+      border: 1px solid var(--border);
+    }
+    .fan-banner.active .fan-state {
+      background: var(--green-dark);
+      color: #fff;
+      border-color: transparent;
+      box-shadow: 0 8px 24px rgba(66, 99, 70, 0.26);
+    }
+
+    /* Sensor Grid */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 16px;
+      width: 100%;
+      max-width: 960px;
+    }
+    .card {
+      position: relative;
+      overflow: hidden;
+      background: var(--surface);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(100, 111, 79, 0.24);
+      border-radius: 26px;
+      padding: 22px 20px;
+      text-align: left;
+      box-shadow: 0 14px 34px rgba(83, 68, 47, 0.12);
+      transition: transform 180ms ease, border-color 180ms ease;
+    }
+    .card:nth-child(1) { background: linear-gradient(145deg, #edf1e2, #d4dfc7); }
+    .card:nth-child(2) { background: linear-gradient(145deg, #f3eadb, #e6d1b8); }
+    .card:nth-child(3) { background: linear-gradient(145deg, #f5efd9, #e8d9ad); }
+    .card::after {
+      content: "";
+      position: absolute;
+      width: 100px;
+      height: 100px;
+      right: -55px;
+      bottom: -65px;
+      border-radius: 50%;
+      background: rgba(107, 133, 81, 0.10);
+      filter: blur(2px);
+    }
+    .card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(83, 119, 73, 0.52);
+    }
+    .card-label-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .sensor-leaf {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      flex: 0 0 38px;
+      border-radius: 50% 50% 50% 12%;
+      background: rgba(113, 143, 92, 0.18);
+      color: var(--green-dark);
+      font-size: 1.15rem;
+    }
+    .card:nth-child(2) .sensor-leaf { background: rgba(164, 119, 77, 0.16); color: var(--cocoa); }
+    .card:nth-child(3) .sensor-leaf { background: rgba(181, 143, 58, 0.18); color: var(--gold); }
+    .label {
+      min-height: 32px;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+    .reading {
+      font-size: 2.65rem;
+      font-weight: 800;
+      line-height: 1;
+      margin: 14px 0 16px;
+      letter-spacing: -0.04em;
+      color: var(--green-dark);
+      text-shadow: 0 1px 0 rgba(255, 255, 255, 0.65);
+    }
+    .card:nth-child(2) .reading { color: var(--cocoa-dark); }
+    .card:nth-child(3) .reading { color: #80621f; }
+    .unit { font-size: 1rem; color: var(--cocoa); font-weight: 800; letter-spacing: 0; }
+    .badge { display: inline-block; padding: 5px 10px; border-radius: 999px; font-size: 0.76rem; font-weight: 700; }
+    .good { background: #d7e5cd; color: #36573b; }
+    .warn { background: var(--gold-light); color: #644b19; }
+    .alert { background: #ead2c4; color: #744735; }
+    footer { margin-top: 24px; font-size: 0.78rem; color: var(--cocoa); }
+    .alert-row {
+      width: 100%;
+      max-width: 960px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 0 0 18px;
+    }
+    .alert-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 42px;
+      padding: 9px 16px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: #f7f2e7;
+      color: var(--green-dark);
+      font: inherit;
+      font-size: 0.86rem;
+      font-weight: 700;
+      box-shadow: 0 8px 20px rgba(86, 70, 50, 0.12);
+      cursor: pointer;
+    }
+    .alert-button:hover { background: #fffaf0; transform: translateY(-1px); }
+    .alert-button[aria-pressed="true"] {
+      background: var(--green-dark);
+      color: #fff;
+    }
+    .alert-button.ringing { animation: bell-ring 0.65s ease-in-out 3; }
+    @keyframes bell-ring {
+      0%, 100% { transform: rotate(0); }
+      20%, 60% { transform: rotate(12deg); }
+      40%, 80% { transform: rotate(-12deg); }
+    }
+    .alert-message {
+      display: none;
+      flex: 1;
+      padding: 11px 15px;
+      border: 1px solid rgba(104, 139, 84, 0.38);
+      border-radius: 18px;
+      background: #e3ecd9;
+      color: #36573b;
+      font-size: 0.88rem;
+      font-weight: 700;
+      box-shadow: 0 8px 20px rgba(71, 100, 57, 0.10);
+    }
+    .alert-message.visible { display: block; }
+    .history-panel {
+      width: 100%;
+      max-width: 960px;
+      margin-top: 20px;
+      padding: 20px;
+      border: 1px solid var(--border);
+      border-radius: 26px;
+      background: rgba(249, 246, 235, 0.94);
+      box-shadow: 0 14px 34px rgba(83, 68, 47, 0.13);
+      backdrop-filter: blur(10px);
+    }
+    .history-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 5px;
+    }
+    .history-title-group { display: grid; gap: 4px; }
+    .history-heading h2 {
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 1.18rem;
+      font-weight: 800;
+      letter-spacing: 0.025em;
+    }
+    .log-title-scb { color: var(--green-dark); }
+    .log-title-colon { color: var(--gold); }
+    .log-title-rest { color: var(--cocoa-dark); }
+    .history-note { color: var(--muted); font-size: 0.8rem; }
+    .daily-logs-toggle {
+      padding: 9px 14px;
+      border: 1px solid rgba(75, 116, 93, 0.24);
+      border-radius: 999px;
+      background: #e0e8d5;
+      color: #38593e;
+      font: inherit;
+      font-size: 0.82rem;
+      font-weight: 750;
+      cursor: pointer;
+    }
+    .daily-logs-toggle:hover { background: #d2dfc5; }
+    .archive-list {
+      display: flex;
+      flex-wrap: wrap;
+      align-content: flex-start;
+      gap: 9px;
+      margin-top: 14px;
+      max-height: 240px;
+      overflow-y: auto;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: rgba(218, 228, 204, 0.74);
+    }
+    .archive-list[hidden] { display: none; }
+    .archive-date-button {
+      padding: 9px 12px;
+      border: 1px solid rgba(75, 116, 93, 0.22);
+      border-radius: 14px;
+      background: rgba(249, 246, 235, 0.92);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.8rem;
+      font-weight: 650;
+      cursor: pointer;
+    }
+    .archive-date-button:hover { border-color: var(--green-dark); }
+    .archive-date-button.selected {
+      border-color: var(--green-dark);
+      background: var(--green-dark);
+      color: #fff;
+    }
+    .selected-log-date {
+      margin-top: 12px;
+      color: var(--green-dark);
+      font-size: 0.9rem;
+      font-weight: 750;
+    }
+    .table-wrap { width: 100%; overflow-x: auto; margin-top: 14px; }
+    .history-table {
+      width: 100%;
+      min-width: 820px;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: 0.84rem;
+      text-align: left;
+    }
+    .history-table th {
+      padding: 10px 12px;
+      background: #d5e0c8;
+      color: #354f36;
+      font-size: 0.72rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .history-table th:first-child { border-radius: 12px 0 0 12px; }
+    .history-table th:last-child { border-radius: 0 12px 12px 0; }
+    .history-table td {
+      padding: 12px;
+      border-bottom: 1px solid rgba(104, 112, 80, 0.17);
+      color: var(--text);
+      vertical-align: top;
+    }
+    .history-table tbody tr:last-child td { border-bottom: 0; }
+    .history-table tbody tr:hover td { background: rgba(224, 232, 213, 0.42); }
+    .history-table tbody tr.selected td { background: #f3ead0; }
+    .history-table td:first-child { min-width: 230px; font-weight: 700; }
+    .daily-value { color: var(--green-dark); font-size: 0.95rem; font-weight: 800; white-space: nowrap; }
+    .temperature-value { color: var(--cocoa-dark); font-weight: 750; white-space: nowrap; }
+    .fan-duration { color: var(--gold); font-weight: 800; white-space: nowrap; }
+    .recorded-time { display: block; margin-top: 4px; color: var(--muted); font-size: 0.77rem; font-weight: 600; white-space: nowrap; }
+    .average-row td { background: #e8ead7; border-top: 2px solid rgba(91, 112, 80, 0.24); font-weight: 800; }
+    .average-label { display: block; color: var(--green-dark); }
+    .average-date { display: block; margin-top: 3px; color: var(--muted); font-size: 0.72rem; font-weight: 600; }
+    .empty-history { padding: 16px 12px; color: var(--muted); text-align: center; }
+    @media (max-width: 680px) {
+      body { padding: 20px 14px; }
+      header { align-items: flex-start; flex-direction: column; }
+      .status-bar { align-self: flex-start; }
+      .fan-banner { align-items: flex-start; }
+      .fan-icon { width: 46px; height: 46px; flex-basis: 46px; }
+      .fan-state { min-width: 68px; }
+      .alert-row { align-items: stretch; flex-direction: column; }
+      .alert-button { align-self: flex-start; }
+      .history-panel { padding: 16px 12px; }
+      .history-heading { align-items: flex-start; flex-direction: column; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .fan-banner.active .fan-icon { animation: none; }
+      .card { transition: none; }
+      .splash-screen { animation-duration: 0.01ms; }
+      .dashboard-content { animation-delay: 0.01ms; animation-duration: 0.01ms; }
+    }
+  </style>
+</head>
+<body>
+  <div class="splash-screen" aria-hidden="true">
+    <div class="splash-content">
+      <img class="splash-logo" src="scb-aeronix-final-logo.png" alt="">
+      <p class="splash-caption">Compost health, monitored with care.</p>
+    </div>
+  </div>
+  <div class="dashboard-content">
+  <div class="garden-leaves" aria-hidden="true">
+    <span></span><span></span><span></span><span></span><span></span>
+  </div>
+
+  <header>
+    <div>
+      <h1 class="brand-heading"><img class="header-logo" src="scb-aeronix-final-logo.png" alt="SCB: AEROnix — Automatic Aeration Monitoring System"></h1>
+      <div class="eyebrow">&#127793; Banana peel + carbonized rice hull</div>
+    </div>
+    <div class="status-bar">
+      <span class="dot" id="conn-dot"></span>
+      <span id="conn-text">Simulation Mode (No ESP32)</span>
+    </div>
+  </header>
+
+  <div class="alert-row">
+    <button class="alert-button" id="alert-button" type="button" aria-label="Turn on fan alerts" aria-pressed="false">
+      <span id="bell-icon" aria-hidden="true">&#128276;</span>
+    </button>
+    <div class="alert-message" id="fan-alert" role="status" aria-live="polite">
+      The ventilation fan has turned on.
+    </div>
+  </div>
+
+  <!-- Automated DC12V Fan Status -->
+  <div class="fan-banner" id="fan-box">
+    <div class="fan-left">
+      <div class="fan-icon" aria-hidden="true">&#8635;</div>
+      <div class="fan-info">
+        <h2>DC12V Compost Ventilation Fan <span style="color: var(--muted); font-weight: 500;">/ Auto</span></h2>
+        <div class="fan-reason" id="fan-reason">Evaluating sensor thresholds...</div>
+        <div class="fan-control-note">The ESP32 firmware controls the relay; this dashboard displays its reported status.</div>
+      </div>
+    </div>
+    <div class="fan-state" id="fan-state">OFF</div>
+  </div>
+
+  <!-- Sensor Cards -->
+  <div class="grid">
+    <div class="card">
+      <div class="card-label-row">
+        <div class="label">Compost Moisture (50-60%)</div>
+        <div class="sensor-leaf" aria-hidden="true">&#9752;</div>
+      </div>
+      <div class="reading"><span id="moisture">--</span><span class="unit"> %</span></div>
+      <div class="badge good" id="moisture-status">Waiting...</div>
+    </div>
+
+    <div class="card">
+      <div class="card-label-row">
+        <div class="label">Compost Temperature (40-60&deg;C)</div>
+        <div class="sensor-leaf" aria-hidden="true">&#9728;</div>
+      </div>
+      <div class="reading"><span id="temp">--</span><span class="unit"> &deg;C</span></div>
+      <div class="badge good" id="temp-status">Waiting...</div>
+    </div>
+
+    <div class="card">
+      <div class="card-label-row">
+        <div class="label">Compost pH (6.5-8.0)</div>
+        <div class="sensor-leaf" aria-hidden="true">&#10047;</div>
+      </div>
+      <div class="reading"><span id="ph">--</span><span class="unit"> pH</span></div>
+      <div class="badge good" id="ph-status">Waiting...</div>
+    </div>
+  </div>
+
+  <section class="history-panel" aria-labelledby="history-title">
+    <div class="history-heading">
+      <div class="history-title-group">
+        <h2 id="history-title"><span class="log-title-scb">SCB</span><span class="log-title-colon">:</span><span class="log-title-rest"> DAILY SYSTEM MONITORING LOG</span></h2>
+        <div class="history-note">Records at 12:00 AM, 6:00 AM, 12:00 PM &amp; 6:00 PM while this dashboard is open · Daily average excludes temperature</div>
+      </div>
+      <button class="daily-logs-toggle" id="daily-logs-toggle" type="button" aria-expanded="false" aria-controls="archive-list">
+        View saved dates
+      </button>
+    </div>
+    <div class="archive-list" id="archive-list" hidden></div>
+    <div class="selected-log-date" id="selected-log-date">No saved sensor readings yet.</div>
+    <div class="table-wrap">
+      <table class="history-table">
+        <thead>
+          <tr>
+            <th>Date &amp; exact record time</th>
+            <th>Soil moisture</th>
+            <th>Temperature</th>
+            <th>Soil pH</th>
+            <th>Fan status / ON time</th>
+          </tr>
+        </thead>
+        <tbody id="history-body">
+          <tr><td class="empty-history" colspan="5">Waiting for the next scheduled sensor reading...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer>Last Updated: <span id="timestamp">--</span></footer>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+  <script>
+    // Firebase web app config from Project settings.
+    const firebaseConfig = {
+      apiKey: 'AIzaSyDdV0F9E8oboRLF7PqwKBp78sHTaNwzhEw',
+      authDomain: 'scb-aeronix.firebaseapp.com',
+      databaseURL: 'https://scb-aeronix-default-rtdb.asia-southeast1.firebasedatabase.app',
+      projectId: 'scb-aeronix',
+      storageBucket: 'scb-aeronix.firebasestorage.app',
+      messagingSenderId: '535674898078',
+      appId: '1:535674898078:web:ae17a98fe04a84d235dd8f'
+    };
+    const FIREBASE_DATA_PATH = 'scb-aeronix/latest';
+    const LIVE_DATA_TIMEOUT_MS = 15000;
+    let simulationMode = true;
+    let lastLiveDataAt = 0;
+
+    function setConnectionStatus(message, state) {
+      document.getElementById('conn-text').innerText = message;
+      document.getElementById('conn-dot').style.backgroundColor =
+        state === 'live' ? '#22c55e' : state === 'error' ? '#ef4444' : '#facc15';
+    }
+
+    function parseLiveTimestamp(value) {
+      if (typeof value === 'number' && Number.isFinite(value)) {
+        return value < 1000000000000 ? value * 1000 : value;
+      }
+      if (typeof value === 'string') {
+        const numericValue = Number(value);
+        if (Number.isFinite(numericValue) && numericValue > 0) {
+          return numericValue < 1000000000000 ? numericValue * 1000 : numericValue;
+        }
+        const parsedValue = Date.parse(value);
+        return Number.isFinite(parsedValue) ? parsedValue : null;
+      }
+      return null;
+    }
+
+    function isFreshFirebaseData(data) {
+      if (!data || typeof data !== 'object') return false;
+      const temperature = typeof data.temperature === 'undefined' ? data.temp : data.temperature;
+      const timestamp = parseLiveTimestamp(data.lastUpdated);
+      const fanStateIsValid = typeof data.fanState === 'boolean' ||
+        data.fanState === 0 || data.fanState === 1 ||
+        (typeof data.fanState === 'string' &&
+          ['on', 'off', 'true', 'false', '1', '0'].includes(data.fanState.trim().toLowerCase()));
+      const age = timestamp === null ? Infinity : Date.now() - timestamp;
+
+      return Number.isFinite(Number(data.moisture)) &&
+        Number.isFinite(Number(temperature)) &&
+        Number.isFinite(Number(data.ph)) &&
+        fanStateIsValid &&
+        typeof data.fanReason === 'string' &&
+        timestamp !== null &&
+        age >= -60000 && age <= LIVE_DATA_TIMEOUT_MS;
+    }
+
+    function connectToFirebase() {
+      const hasPlaceholder = Object.values(firebaseConfig).some(value => value.includes('YOUR_'));
+      if (hasPlaceholder) {
+        console.info('Firebase config is not set; running in simulation mode.');
+        return;
+      }
+      if (typeof firebase === 'undefined') {
+        console.error('Firebase SDK failed to load; running in simulation mode.');
+        setConnectionStatus('Firebase unavailable · Simulation Mode', 'error');
+        return;
+      }
+
+      try {
+        firebase.initializeApp(firebaseConfig);
+        firebase.auth().signInAnonymously().then(() => {
+          firebase.database().ref(FIREBASE_DATA_PATH).on('value', snapshot => {
+            const data = snapshot.val();
+            if (!isFreshFirebaseData(data)) return;
+
+            lastLiveDataAt = Date.now();
+            simulationMode = false;
+            setConnectionStatus('Live Mode (Firebase)', 'live');
+            updateDashboard({
+              moisture: Number(data.moisture),
+              temp: Number(typeof data.temperature === 'undefined' ? data.temp : data.temperature),
+              ph: Number(data.ph),
+              fan: data.fanState,
+              fanReason: data.fanReason,
+              lastUpdated: data.lastUpdated
+            });
+          }, error => {
+            console.error('Firebase sensor listener failed:', error);
+            setConnectionStatus('Firebase unavailable · Simulation Mode', 'error');
+          });
+        }).catch(error => {
+          console.error('Firebase anonymous sign-in failed:', error);
+          setConnectionStatus('Firebase unavailable · Simulation Mode', 'error');
+        });
+      } catch (error) {
+        console.error('Firebase initialization failed:', error);
+        setConnectionStatus('Firebase unavailable · Simulation Mode', 'error');
+      }
+    }
+
+    // Compost fan thresholds and aeration timing
+    const TEMP_FAN_ON = 60.0;
+    const TEMP_FAN_OFF = 57.0;
+    const TEMP_ACTIVE_MIN = 40.0;
+    const MOISTURE_FAN_ON = 60.0;
+    const MOISTURE_FAN_OFF = 58.0;
+    const MOISTURE_DRY_LOCKOUT = 45.0;
+    const PH_FAN_ON = 5.5;
+    const PH_FAN_OFF = 6.0;
+    const PH_PROBE_MIN = 1.0;
+    const PH_HIGH_LOCKOUT = 8.5;
+    const MOISTURE_TARGET_MIN = 50.0;
+    const PH_TARGET_MIN = 6.5;
+    const PH_TARGET_MAX = 8.0;
+    const AERATION_INTERVAL_MS = 60 * 60 * 1000;
+    const AERATION_DURATION_MS = 3 * 60 * 1000;
+    const SAMPLE_HOURS = [0, 6, 12, 18];
+    const SAMPLE_GRACE_MS = 5 * 60 * 1000;
+
+    const HISTORY_KEY = 'soilClimateMonitor.history.v1';
+    const FAN_EVENTS_KEY = 'soilClimateMonitor.fanEvents.v1';
+    const HISTORY_FIELDS = [
+      { key: 'moisture', label: 'Soil moisture', unit: '%' },
+      { key: 'temp', label: 'Temperature', unit: '°C' },
+      { key: 'ph', label: 'Soil pH', unit: 'pH' }
+    ];
+    let historySamples = [];
+    let fanEvents = [];
+    let selectedLogDate = null;
+    let manuallySelectedDate = false;
+    let lastFanDurationRenderMinute = -1;
+    let temperatureFanDemand = false;
+    let moistureFanDemand = false;
+    let acidicFanDemand = false;
+    let fanWasOn = null;
+    let fanAlertsEnabled = false;
+    let audioContext = null;
+    let nextSampleSlot = getNextSampleSlot(Date.now(), true);
+
+    function loadHistory() {
+      try {
+        const saved = localStorage.getItem(HISTORY_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed)) {
+            historySamples = parsed.filter(sample =>
+              sample &&
+              Number.isFinite(sample.timestamp) &&
+              HISTORY_FIELDS.every(field => Number.isFinite(sample[field.key]))
+            );
+          }
+        }
+      } catch (error) {
+        document.querySelector('.history-note').textContent =
+          'History storage is unavailable in this browser; readings will not persist.';
+      }
+      historySamples.sort((left, right) => left.timestamp - right.timestamp);
+      renderArchiveList();
+      renderHistory();
+    }
+
+    function loadFanEvents() {
+      try {
+        const saved = localStorage.getItem(FAN_EVENTS_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed)) {
+            fanEvents = parsed.filter(event =>
+              event &&
+              Number.isFinite(event.timestamp) &&
+              typeof event.on === 'boolean'
+            );
+          }
+        }
+      } catch (error) {
+        document.querySelector('.history-note').textContent =
+          'Fan history storage is unavailable in this browser.';
+      }
+      fanEvents.sort((left, right) => left.timestamp - right.timestamp);
+    }
+
+    function getLogDateKey(timestamp) {
+      const date = new Date(timestamp);
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
+    function formatLogDate(dateKey) {
+      const [year, month, day] = dateKey.split('-').map(Number);
+      return new Date(year, month - 1, day).toLocaleDateString([], {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    }
+
+    function formatSampleTimestamp(timestamp) {
+      return new Date(timestamp).toLocaleString([], {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true
+      });
+    }
+
+    function getNextSampleSlot(now, allowGraceWindow = false) {
+      const current = new Date(now);
+      const startOfDay = new Date(current.getFullYear(), current.getMonth(), current.getDate());
+      for (const hour of SAMPLE_HOURS) {
+        const slot = new Date(startOfDay);
+        slot.setHours(hour, 0, 0, 0);
+        if (slot.getTime() >= now || (allowGraceWindow && now - slot.getTime() <= SAMPLE_GRACE_MS)) {
+          return slot.getTime();
+        }
+      }
+      startOfDay.setDate(startOfDay.getDate() + 1);
+      return startOfDay.getTime();
+    }
+
+    function getSamplesByDate() {
+      const samplesByDate = new Map();
+      historySamples.forEach(sample => {
+        const dateKey = getLogDateKey(sample.timestamp);
+        if (!samplesByDate.has(dateKey)) samplesByDate.set(dateKey, []);
+        samplesByDate.get(dateKey).push(sample);
+      });
+      return samplesByDate;
+    }
+
+    function getLogDateKeys() {
+      const dateKeys = new Set(historySamples.map(sample => getLogDateKey(sample.timestamp)));
+      fanEvents.forEach(event => dateKeys.add(getLogDateKey(event.timestamp)));
+      return [...dateKeys].sort().reverse();
+    }
+
+    function getFanOnDuration(dateKey) {
+      if (!fanEvents.length) return null;
+      const [year, month, day] = dateKey.split('-').map(Number);
+      const dayStart = new Date(year, month - 1, day).getTime();
+      const nextDay = new Date(year, month - 1, day + 1).getTime();
+      const dayEnd = Math.min(nextDay, dateKey === getLogDateKey(Date.now()) ? Date.now() : nextDay);
+      let state = null;
+      let intervalStart = dayStart;
+      let total = 0;
+      let hasStateForDay = false;
+
+      for (const event of fanEvents) {
+        if (event.timestamp < dayStart) {
+          state = event.on;
+          hasStateForDay = true;
+          continue;
+        }
+        if (event.timestamp >= dayEnd) break;
+        if (state === true) total += event.timestamp - intervalStart;
+        state = event.on;
+        intervalStart = event.timestamp;
+        hasStateForDay = true;
+      }
+      if (state === true) total += dayEnd - intervalStart;
+      return hasStateForDay ? total : null;
+    }
+
+    function getFanStateAt(timestamp) {
+      let state = null;
+      for (const event of fanEvents) {
+        if (event.timestamp > timestamp) break;
+        state = event.on;
+      }
+      return state === null ? 'No status' : state ? 'ON' : 'OFF';
+    }
+
+    function formatFanDuration(milliseconds) {
+      if (milliseconds === null) return 'No fan history';
+      const totalMinutes = Math.round(milliseconds / 60000);
+      if (milliseconds > 0 && totalMinutes === 0) return '<1 min';
+      const hours = Math.floor(totalMinutes / 60);
+      const minutes = totalMinutes % 60;
+      return hours ? `${hours} h ${minutes} min` : `${minutes} min`;
+    }
+
+    function renderArchiveList() {
+      const list = document.getElementById('archive-list');
+      const dateKeys = getLogDateKeys();
+      const samplesByDate = getSamplesByDate();
+      if (!dateKeys.includes(selectedLogDate)) selectedLogDate = dateKeys[0] || null;
+
+      while (list.firstChild) list.removeChild(list.firstChild);
+      if (!dateKeys.length) {
+        const empty = document.createElement('span');
+        empty.className = 'history-note';
+        empty.textContent = 'Daily records will appear here after the first sensor or fan reading.';
+        list.appendChild(empty);
+        return;
+      }
+
+      dateKeys.forEach(dateKey => {
+        const count = (samplesByDate.get(dateKey) || []).length;
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'archive-date-button';
+        button.classList.toggle('selected', dateKey === selectedLogDate);
+        button.setAttribute('aria-pressed', String(dateKey === selectedLogDate));
+        button.textContent = `${formatLogDate(dateKey)} · ${count ? `${count} ${count === 1 ? 'reading' : 'readings'}` : 'fan activity'}`;
+        button.addEventListener('click', () => {
+          selectedLogDate = dateKey;
+          manuallySelectedDate = true;
+          renderArchiveList();
+          renderHistory();
+          const row = document.getElementById(`log-date-${dateKey}`);
+          if (row) row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+        list.appendChild(button);
+      });
+    }
+
+    function recordFanEvent(on, timestamp = Date.now()) {
+      const latest = fanEvents.length ? fanEvents[fanEvents.length - 1] : null;
+      if (latest && latest.on === on) return false;
+
+      fanEvents.push({ timestamp, on });
+      if (!manuallySelectedDate) selectedLogDate = getLogDateKey(timestamp);
+      try {
+        localStorage.setItem(FAN_EVENTS_KEY, JSON.stringify(fanEvents));
+      } catch (error) {
+        document.querySelector('.history-note').textContent =
+          'Could not save fan activity; keep this page open to track today.';
+      }
+      renderArchiveList();
+      renderHistory();
+      return true;
+    }
+
+    function recordHistorySample(data) {
+      const now = Date.now();
+      if (now < nextSampleSlot) return;
+      if (now - nextSampleSlot > SAMPLE_GRACE_MS) {
+        nextSampleSlot = getNextSampleSlot(now + 1);
+        return;
+      }
+      if (historySamples.some(sample => sample.slotTimestamp === nextSampleSlot)) {
+        nextSampleSlot = getNextSampleSlot(now + 1);
+        return;
+      }
+
+      const sample = { timestamp: now, slotTimestamp: nextSampleSlot };
+      HISTORY_FIELDS.forEach(field => {
+        sample[field.key] = Number(data[field.key]);
+      });
+      if (!HISTORY_FIELDS.every(field => Number.isFinite(sample[field.key]))) return;
+
+      historySamples.push(sample);
+      nextSampleSlot = getNextSampleSlot(now + SAMPLE_GRACE_MS + 1);
+      if (!manuallySelectedDate) selectedLogDate = getLogDateKey(sample.timestamp);
+      renderArchiveList();
+      renderHistory();
+      try {
+        localStorage.setItem(HISTORY_KEY, JSON.stringify(historySamples));
+      } catch (error) {
+        document.querySelector('.history-note').textContent =
+          'Could not save history in this browser; keep this page open to view readings.';
+      }
+    }
+
+    function renderHistory() {
+      const body = document.getElementById('history-body');
+      const selectedDate = document.getElementById('selected-log-date');
+      selectedDate.textContent = selectedLogDate
+        ? `${formatLogDate(selectedLogDate)} · selected`
+        : 'No saved sensor readings yet.';
+      const samplesByDate = getSamplesByDate();
+      const dateKeys = getLogDateKeys();
+      if (!dateKeys.length) {
+        body.innerHTML = '<tr><td class="empty-history" colspan="5">Waiting for the next scheduled sensor reading...</td></tr>';
+        return;
+      }
+
+      body.innerHTML = dateKeys.map(dateKey => {
+        const samples = samplesByDate.get(dateKey) || [];
+        const moistureAverage = samples.length
+          ? `${(samples.reduce((sum, sample) => sum + sample.moisture, 0) / samples.length).toFixed(1)}%`
+          : 'No readings';
+        const phAverage = samples.length
+          ? (samples.reduce((sum, sample) => sum + sample.ph, 0) / samples.length).toFixed(1)
+          : 'No readings';
+        const isSelected = dateKey === selectedLogDate;
+        const readingRows = samples.map(sample => `<tr class="reading-row${isSelected ? ' selected' : ''}">
+          <td><div>${formatLogDate(dateKey)}</div><time class="recorded-time" datetime="${new Date(sample.timestamp).toISOString()}">${formatSampleTimestamp(sample.timestamp)}</time></td>
+          <td class="daily-value">${sample.moisture.toFixed(1)}%</td>
+          <td class="temperature-value">${sample.temp.toFixed(1)}°C</td>
+          <td class="daily-value">${sample.ph.toFixed(1)}</td>
+          <td class="fan-duration">${getFanStateAt(sample.timestamp)}</td>
+        </tr>`).join('');
+        return `${readingRows}
+          <tr id="log-date-${dateKey}" class="average-row${isSelected ? ' selected' : ''}">
+            <td><span class="average-label">Daily average</span><span class="average-date">${formatLogDate(dateKey)}</span></td>
+            <td class="daily-value">${moistureAverage}</td>
+            <td class="temperature-value">Not averaged</td>
+            <td class="daily-value">${phAverage}</td>
+            <td class="fan-duration">${formatFanDuration(getFanOnDuration(dateKey))}</td>
+          </tr>`;
+      }).join('');
+    }
+
+    document.getElementById('daily-logs-toggle').addEventListener('click', event => {
+      const list = document.getElementById('archive-list');
+      list.hidden = !list.hidden;
+      event.currentTarget.setAttribute('aria-expanded', String(!list.hidden));
+      event.currentTarget.textContent = list.hidden ? 'View saved dates' : 'Hide saved dates';
+    });
+
+    function ringBell() {
+      if (!fanAlertsEnabled) return;
+      const bell = document.getElementById('alert-button');
+      bell.classList.remove('ringing');
+      void bell.offsetWidth;
+      bell.classList.add('ringing');
+      window.setTimeout(() => bell.classList.remove('ringing'), 2100);
+
+      if (!audioContext) return;
+      if (audioContext.state === 'suspended') audioContext.resume();
+      [880, 660, 880].forEach((frequency, index) => {
+        const start = audioContext.currentTime + index * 0.24;
+        const oscillator = audioContext.createOscillator();
+        const volume = audioContext.createGain();
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(frequency, start);
+        volume.gain.setValueAtTime(0.0001, start);
+        volume.gain.exponentialRampToValueAtTime(0.22, start + 0.015);
+        volume.gain.exponentialRampToValueAtTime(0.0001, start + 0.42);
+        oscillator.connect(volume);
+        volume.connect(audioContext.destination);
+        oscillator.start(start);
+        oscillator.stop(start + 0.43);
+      });
+    }
+
+    function calculateFanDecision(data, now = Date.now()) {
+      const temperature = Number(data.temp);
+      const moisture = Number(data.moisture);
+      const ph = Number(data.ph);
+
+      temperatureFanDemand = Number.isFinite(temperature) && temperature > TEMP_FAN_ON
+        ? true
+        : Number.isFinite(temperature) && temperature > TEMP_FAN_OFF
+          ? temperatureFanDemand
+          : false;
+      moistureFanDemand = Number.isFinite(moisture) && moisture > MOISTURE_FAN_ON
+        ? true
+        : Number.isFinite(moisture) && moisture > MOISTURE_FAN_OFF && moisture >= MOISTURE_DRY_LOCKOUT
+          ? moistureFanDemand
+          : false;
+      acidicFanDemand = Number.isFinite(ph) && ph > PH_PROBE_MIN && ph < PH_FAN_ON
+        ? true
+        : Number.isFinite(ph) && ph > PH_PROBE_MIN && ph < PH_FAN_OFF && ph <= PH_HIGH_LOCKOUT
+          ? acidicFanDemand
+          : false;
+
+      const overheating = temperature > TEMP_FAN_ON;
+      const drynessLockout = moisture < MOISTURE_DRY_LOCKOUT;
+      const highPhLockout = ph > PH_HIGH_LOCKOUT;
+      const activePhase = temperature >= TEMP_ACTIVE_MIN && temperature <= TEMP_FAN_ON;
+      const aerationWindow = now % AERATION_INTERVAL_MS < AERATION_DURATION_MS;
+      const scheduledAeration = activePhase && aerationWindow;
+
+      if (overheating) {
+        return { on: true, reason: `Overheat protection: ${temperature.toFixed(1)}°C is above 60.0°C.` };
+      }
+      if (drynessLockout) {
+        return { on: false, reason: 'Dryness lockout: moisture is below 45%; fan stays off.' };
+      }
+      if (highPhLockout) {
+        return { on: false, reason: 'High-pH lockout: above 8.5; avoid airflow to limit nitrogen loss.' };
+      }
+
+      const triggers = [];
+      if (temperatureFanDemand) {
+        triggers.push(temperature > TEMP_FAN_ON
+          ? 'Temperature above 60.0°C'
+          : 'Temperature has not cooled to 57.0°C');
+      }
+      if (moistureFanDemand) {
+        triggers.push(moisture > MOISTURE_FAN_ON
+          ? 'Moisture above 60%'
+          : 'Moisture has not fallen to 58%');
+      }
+      if (acidicFanDemand) {
+        triggers.push(ph < PH_FAN_ON
+          ? 'Acidic pH below 5.5'
+          : 'pH has not risen to 6.0');
+      }
+      if (scheduledAeration) triggers.push('Scheduled 3-minute hourly aeration');
+
+      if (triggers.length) return { on: true, reason: triggers.join(' · ') };
+      if (temperature < TEMP_ACTIVE_MIN) {
+        return { on: false, reason: 'Below the 40°C active phase; retaining compost heat.' };
+      }
+      return { on: false, reason: 'Conditions are within target; waiting for the next hourly aeration.' };
+    }
+
+    function readReportedFanState(value) {
+      if (typeof value === 'string') {
+        return ['on', 'true', '1'].includes(value.trim().toLowerCase());
+      }
+      return value === true || value === 1;
+    }
+
+    function updateFanAlert(fanOn) {
+      const alert = document.getElementById('fan-alert');
+      const currentFanState = Boolean(fanOn);
+      const fanTurnedOn = currentFanState && fanWasOn !== true;
+      const stateChanged = fanWasOn === null || currentFanState !== fanWasOn;
+      alert.classList.toggle('visible', fanAlertsEnabled && currentFanState);
+
+      if (stateChanged) recordFanEvent(currentFanState);
+      if (fanTurnedOn && fanAlertsEnabled) ringBell();
+      fanWasOn = currentFanState;
+
+      if (currentFanState) {
+        const minute = Math.floor(Date.now() / 60000);
+        if (minute !== lastFanDurationRenderMinute) {
+          lastFanDurationRenderMinute = minute;
+          renderHistory();
+        }
+      }
+    }
+
+    document.getElementById('alert-button').addEventListener('click', () => {
+      fanAlertsEnabled = !fanAlertsEnabled;
+      const alertButton = document.getElementById('alert-button');
+      const fanAlert = document.getElementById('fan-alert');
+      alertButton.setAttribute('aria-pressed', String(fanAlertsEnabled));
+      alertButton.setAttribute('aria-label', fanAlertsEnabled ? 'Turn off fan alerts' : 'Turn on fan alerts');
+      fanAlert.classList.toggle('visible', fanAlertsEnabled && fanWasOn === true);
+
+      if (fanAlertsEnabled) {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioContextClass) {
+          audioContext = audioContext || new AudioContextClass();
+          if (audioContext.state === 'suspended') audioContext.resume();
+        }
+      }
+      if (fanAlertsEnabled && fanWasOn === true) ringBell();
+    });
+
+    function updateDashboard(data) {
+      const moisture = Number(data.moisture);
+      const temperature = Number(data.temp);
+      const ph = Number(data.ph);
+      document.getElementById('moisture').innerText = data.moisture;
+      document.getElementById('temp').innerText = data.temp;
+      document.getElementById('ph').innerText = data.ph;
+      const lastUpdated = parseLiveTimestamp(data.lastUpdated) || Date.now();
+      document.getElementById('timestamp').innerText = new Date(lastUpdated).toLocaleString([], {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      });
+      recordHistorySample(data);
+
+      // 1. Soil Moisture Evaluation
+      const mBadge = document.getElementById('moisture-status');
+      if (!Number.isFinite(moisture)) { mBadge.innerText = 'Sensor unavailable'; mBadge.className = 'badge warn'; }
+      else if (moisture < MOISTURE_DRY_LOCKOUT) { mBadge.innerText = 'Dryness lockout'; mBadge.className = 'badge alert'; }
+      else if (moisture > MOISTURE_FAN_ON) { mBadge.innerText = 'Excess moisture'; mBadge.className = 'badge warn'; }
+      else if (moisture < MOISTURE_TARGET_MIN) { mBadge.innerText = 'Below target'; mBadge.className = 'badge warn'; }
+      else { mBadge.innerText = 'Within target'; mBadge.className = 'badge good'; }
+
+      // 2. Temperature Evaluation
+      const tBadge = document.getElementById('temp-status');
+      if (!Number.isFinite(temperature)) { tBadge.innerText = 'Sensor unavailable'; tBadge.className = 'badge warn'; }
+      else if (temperature > TEMP_FAN_ON) { tBadge.innerText = 'Overheat — fan trigger'; tBadge.className = 'badge alert'; }
+      else if (temperature < TEMP_ACTIVE_MIN) { tBadge.innerText = 'Below active phase'; tBadge.className = 'badge warn'; }
+      else { tBadge.innerText = 'Active compost phase'; tBadge.className = 'badge good'; }
+
+      // 3. Soil pH Evaluation
+      const pBadge = document.getElementById('ph-status');
+      if (!Number.isFinite(ph) || ph <= PH_PROBE_MIN) { pBadge.innerText = 'Probe unavailable'; pBadge.className = 'badge warn'; }
+      else if (ph < PH_FAN_ON) { pBadge.innerText = 'Acidic — fan trigger'; pBadge.className = 'badge alert'; }
+      else if (ph > PH_HIGH_LOCKOUT) { pBadge.innerText = 'High-pH airflow lockout'; pBadge.className = 'badge alert'; }
+      else if (ph < PH_TARGET_MIN || ph > PH_TARGET_MAX) { pBadge.innerText = 'Outside target'; pBadge.className = 'badge warn'; }
+      else { pBadge.innerText = 'Within target'; pBadge.className = 'badge good'; }
+
+      const fanDecision = calculateFanDecision(data);
+      const hasReportedFan = typeof data.fan !== 'undefined';
+      const fanOn = hasReportedFan ? readReportedFanState(data.fan) : fanDecision.on;
+      updateFanAlert(fanOn);
+
+      const fanBox = document.getElementById('fan-box');
+      const fanState = document.getElementById('fan-state');
+      const fanReason = document.getElementById('fan-reason');
+
+      if (fanOn) {
+        fanBox.classList.add('active');
+        fanState.innerText = 'ON';
+      } else {
+        fanBox.classList.remove('active');
+        fanState.innerText = 'OFF';
+      }
+      fanReason.innerText = hasReportedFan
+        ? (data.fanReason || `ESP32 reports fan ${fanOn ? 'ON' : 'OFF'}; dashboard rules request ${fanDecision.on ? 'ON' : 'OFF'}. ${fanDecision.reason}`)
+        : fanDecision.reason;
+    }
+
+    function fetchSensorData() {
+      if (simulationMode) {
+        const mockData = {
+          moisture: Math.floor(Math.random() * 45) + 35,     // 35% - 79%
+          temp: parseFloat((Math.random() * 33 + 35).toFixed(1)), // 35.0°C - 68.0°C
+          ph: parseFloat((Math.random() * 4.6 + 4.4).toFixed(1))  // 4.4 - 9.0 pH
+        };
+        updateDashboard(mockData);
+      }
+    }
+
+    loadFanEvents();
+    loadHistory();
+    fetchSensorData();
+    connectToFirebase();
+    setInterval(fetchSensorData, 3000);
+    setInterval(() => {
+      if (!simulationMode && Date.now() - lastLiveDataAt > LIVE_DATA_TIMEOUT_MS) {
+        simulationMode = true;
+        setConnectionStatus('Simulation Mode (Firebase data stale)', 'simulation');
+        fetchSensorData();
+      }
+    }, 1000);
+  </script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(error => {
+          console.error('Service worker registration failed:', error);
+        });
+      });
+    }
+  </script>
+</body>
+</html>
